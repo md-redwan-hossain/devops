@@ -5,11 +5,11 @@ services:
     restart: unless-stopped
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: Strong-Password@1234
+      MSSQL_SA_PASSWORD: "Strong-Password@1234"
     ports:
       - "1433:1433"
     volumes:
-      - "mssql_data:var/opt/sqlserver/data"
+      - "mssql_data:/var/opt/sqlserver/data"
 
 volumes:
   mssql_data:
