@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  mysql_db:
+    image: bitnami/mysql:8.2
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: master-super-password
+      MYSQL_USER: super-admin
+      MYSQL_PASSWORD: super-password
+      MYSQL_DATABASE: TodoFleet
+      POSTGRESQL_TIMEZONE: "Asia/Dhaka"
+    ports:
+      - "3306:3306"
+    volumes:
+      - "mysql_data:/bitnami/postgresql"
+
+volumes:
+  mysql_data:

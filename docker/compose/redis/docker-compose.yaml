@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  redis_db:
+    image: "bitnami/redis:7.2"
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - "redis_data:/bitnami/redis/data"
+    environment:
+      REDIS_PASSWORD: admin
+      REDIS_IO_THREADS: 4
+      REDIS_IO_THREADS_DO_READS: yes
+      REDIS_DISABLE_COMMANDS: FLUSHDB,FLUSHALL
+
+volumes:
+  redis_data:
