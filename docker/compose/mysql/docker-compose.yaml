@@ -12,7 +12,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - "mysql_data:/bitnami/postgresql"
+      - "mysql_data:/bitnami/mysql/data"
 
 volumes:
   mysql_data:

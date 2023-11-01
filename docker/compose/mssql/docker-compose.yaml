@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  mssql_db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: Strong-Password@1234
+    ports:
+      - "1433:1433"
+    volumes:
+      - "mssql_data:var/opt/sqlserver/data"
+
+volumes:
+  mssql_data:
