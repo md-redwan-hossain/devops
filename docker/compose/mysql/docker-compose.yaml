@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3"
 services:
   mysql_db:
     image: bitnami/mysql:8.2

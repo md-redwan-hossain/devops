@@ -3,7 +3,7 @@ version: "3"
 services:
   smtp4dev:
     image: rnwood/smtp4dev:latest
-    restart: always
+    restart: unless-stopped
     ports:
       # Change the number before : to the port the web interface should be accessible on
       - "5000:80"
