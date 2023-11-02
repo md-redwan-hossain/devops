@@ -1,4 +1,4 @@
-version: "3.9"
+version: "3"
 services:
   mssql_db:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -9,7 +9,7 @@ services:
     ports:
       - "1433:1433"
     volumes:
-      - "mssql_data:/var/opt/sqlserver/data"
+      - ./mssql_data:/var/opt/mssql/data
 
-volumes:
-  mssql_data:
+# volumes:
+#   mssql_data:
