@@ -7,7 +7,7 @@ services:
       MYSQL_ROOT_PASSWORD: master-super-password
       MYSQL_USER: super-admin
       MYSQL_PASSWORD: super-password
-      MYSQL_DATABASE: TodoFleet
+      MYSQL_DATABASE: demo-db
       POSTGRESQL_TIMEZONE: "Asia/Dhaka"
     ports:
       - "3306:3306"
