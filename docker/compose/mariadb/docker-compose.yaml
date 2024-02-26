@@ -1,0 +1,17 @@
+version: "3"
+services:
+  mariadb_db:
+    image: bitnami/mariadb:11.2
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: master-super-password
+      MARIADB_USER: super-admin
+      MARIADB_PASSWORD: super-password
+      MARIADB_DATABASE: demo_db
+    ports:
+      - "3309:3306"
+    volumes:
+      - "mariadb_data:/bitnami/mariadb"
+
+volumes:
+  mariadb_data:

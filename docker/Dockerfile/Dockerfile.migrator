@@ -1,0 +1,6 @@
+FROM amacneil/dbmate
+LABEL maintainer="Md. Redwan Hossain"
+WORKDIR /migrator
+COPY db .
+COPY migrator.py .
+RUN apk update && apk add python3
