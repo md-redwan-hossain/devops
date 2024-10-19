@@ -26,10 +26,7 @@ echo "deb [arch=$arch signed-by=/usr/share/keyrings/docker.gpg] https://download
 sudo apt update
 
 # Install Docker packages
-sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y 
-
-# Check if Docker is active
-sudo systemctl is-active docker
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
 # Add the current user to the Docker group
 sudo usermod -aG docker ${USER}
