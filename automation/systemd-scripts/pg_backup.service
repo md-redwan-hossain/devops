@@ -1,0 +1,13 @@
+# PostgreSQL Backup Service (/etc/systemd/system/pg_backup.service)
+[Unit]
+Description=PostgreSQL Backup Service
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/bash -c 'test -f $HOME/pg_backup.py || { echo "Backup script not found"; exit 1; } && chmod +x $HOME/pg_backup.py'
+ExecStart=$HOME/pg_backup.py
+User=$USER
+
+[Install]
+WantedBy=multi-user.target
