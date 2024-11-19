@@ -1,4 +1,3 @@
-# PostgreSQL Backup Timer (/etc/systemd/system/pg_backup.timer)
 [Unit]
 Description=PostgreSQL Backup Timer
 
