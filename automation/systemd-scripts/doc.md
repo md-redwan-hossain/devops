@@ -1,4 +1,4 @@
-sudo cp -r . /etc/systemd/system/
+sudo cp pg_backup.service pg_backup.timer /etc/systemd/system/
 
 sudo systemctl daemon-reload
 sudo systemctl enable pg_backup.timer
