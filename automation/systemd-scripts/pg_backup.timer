@@ -3,7 +3,6 @@ Description=PostgreSQL Backup Timer
 
 [Timer]
 OnCalendar=*-*-* 01:00:00
-OnCalendar=*-*-* 20:00:00
 Persistent=true
 
 [Install]
