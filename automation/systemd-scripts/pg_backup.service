@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=oneshot
-ExecStartPre=/bin/bash -c 'test -f $HOME/pg_backup.py || { echo "Backup script not found"; exit 1; } && chmod +x $HOME/pg_backup.py'
-ExecStart=/usr/bin/python3 $HOME/pg_backup.py
-User=$USER
+ExecStartPre=chmod +x /home/demo_user/pg_backup.py
+ExecStart=/usr/bin/python3 /home/demo_user/pg_backup.py
+User=demo_user
 
 [Install]
 WantedBy=multi-user.target
