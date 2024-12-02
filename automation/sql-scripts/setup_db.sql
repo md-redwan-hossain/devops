@@ -4,7 +4,9 @@
 \set admin_user 'test_db_admin'
 \set admin_password 'admin_password'
 \set regular_user 'test_db_user'
-\set user_password 'user_password'
+\set regular_user_password 'regular_user_password'
+\set readonly_user 'test_db_readonly'
+\set readonly_user_password 'readonly_user_password'
 
 
 \if FALSE
@@ -19,7 +21,8 @@ CREATE SCHEMA :schema_to_create;
 
 -- Create users
 CREATE USER :admin_user WITH ENCRYPTED PASSWORD :'admin_password';
-CREATE USER :regular_user WITH ENCRYPTED PASSWORD :'user_password';
+CREATE USER :regular_user WITH ENCRYPTED PASSWORD :'regular_user_password';
+CREATE USER :readonly_user WITH ENCRYPTED PASSWORD :'readonly_user_password';
 
 \endif
 
@@ -87,3 +90,51 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO :regular_user;
 
 ALTER DEFAULT PRIVILEGES FOR ROLE :admin_user IN SCHEMA public
 GRANT EXECUTE ON FUNCTIONS TO :regular_user;
+
+
+-- Grant privileges to the read-only user on test_schema
+GRANT CONNECT ON DATABASE :dbname TO :readonly_user;
+GRANT USAGE ON SCHEMA :schema_to_create TO :readonly_user;
+
+-- Grant SELECT privilege on all tables and views in test_schema
+GRANT SELECT ON ALL TABLES IN SCHEMA :schema_to_create TO :readonly_user;
+GRANT SELECT ON ALL VIEWS IN SCHEMA :schema_to_create TO :readonly_user;
+
+-- Grant USAGE and SELECT privilege on all sequences in test_schema
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA :schema_to_create TO :readonly_user;
+
+-- Grant EXECUTE privilege on all functions in test_schema
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA :schema_to_create TO :readonly_user;
+
+-- Set default privileges for the read-only user for new objects in test_schema
+ALTER DEFAULT PRIVILEGES FOR ROLE :admin_user IN SCHEMA :schema_to_create
+GRANT SELECT ON TABLES TO :readonly_user;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE :admin_user IN SCHEMA :schema_to_create
+GRANT USAGE, SELECT ON SEQUENCES TO :readonly_user;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE :admin_user IN SCHEMA :schema_to_create
+GRANT EXECUTE ON FUNCTIONS TO :readonly_user;
+
+-- Grant privileges to the read-only user on public schema
+GRANT USAGE ON SCHEMA public TO :readonly_user;
+
+-- Grant SELECT privilege on all tables and views in public schema
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO :readonly_user;
+GRANT SELECT ON ALL VIEWS IN SCHEMA public TO :readonly_user;
+
+-- Grant USAGE and SELECT privilege on all sequences in public schema
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO :readonly_user;
+
+-- Grant EXECUTE privilege on all functions in public schema
+GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA public TO :readonly_user;
+
+-- Set default privileges for the read-only user for new objects in public schema
+ALTER DEFAULT PRIVILEGES FOR ROLE :admin_user IN SCHEMA public
+GRANT SELECT ON TABLES TO :readonly_user;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE :admin_user IN SCHEMA public
+GRANT USAGE, SELECT ON SEQUENCES TO :readonly_user;
+
+ALTER DEFAULT PRIVILEGES FOR ROLE :admin_user IN SCHEMA public
+GRANT EXECUTE ON FUNCTIONS TO :readonly_user;
