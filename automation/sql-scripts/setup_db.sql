@@ -9,7 +9,7 @@
 \set readonly_user_password 'readonly_user_password'
 
 
-\if FALSE
+\if TRUE
 -- Create the database
 CREATE DATABASE :dbname;
 
@@ -98,7 +98,6 @@ GRANT USAGE ON SCHEMA :schema_to_create TO :readonly_user;
 
 -- Grant SELECT privilege on all tables and views in test_schema
 GRANT SELECT ON ALL TABLES IN SCHEMA :schema_to_create TO :readonly_user;
-GRANT SELECT ON ALL VIEWS IN SCHEMA :schema_to_create TO :readonly_user;
 
 -- Grant USAGE and SELECT privilege on all sequences in test_schema
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA :schema_to_create TO :readonly_user;
@@ -121,7 +120,6 @@ GRANT USAGE ON SCHEMA public TO :readonly_user;
 
 -- Grant SELECT privilege on all tables and views in public schema
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO :readonly_user;
-GRANT SELECT ON ALL VIEWS IN SCHEMA public TO :readonly_user;
 
 -- Grant USAGE and SELECT privilege on all sequences in public schema
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO :readonly_user;
