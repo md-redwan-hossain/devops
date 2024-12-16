@@ -10,6 +10,15 @@
 
 
 \if TRUE
+
+\if TRUE
+DROP DATABASE IF EXISTS :dbname;
+DROP USER IF EXISTS :admin_user;
+DROP USER IF EXISTS :regular_user;
+DROP USER IF EXISTS :readonly_user;
+
+\endif
+
 -- Create the database
 CREATE DATABASE :dbname;
 
