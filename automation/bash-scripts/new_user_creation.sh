@@ -5,17 +5,17 @@ set -euo pipefail
 source_user="${SUDO_USER:-$USER}"
 read -p "Enter new username: " username
 
-# Prompt for password twice (hidden)
-read -s -p "Enter password for $username: " password
-echo
-read -s -p "Confirm password for $username: " password2
-echo
-
-# If they don’t match, exit with error
-if [[ "$password" != "$password2" ]]; then
-  echo "Error: passwords do not match." >&2
-  exit 1
-fi
+# Loop until password and confirmation match
+while true; do
+  read -s -p "Enter password for $username: " password
+  echo
+  read -s -p "Confirm password for $username: " password2
+  echo
+  if [[ "$password" == "$password2" ]]; then
+    break
+  fi
+  echo "Passwords do not match. Please try again." >&2
+done
 
 # Create the user and set the password
 adduser --disabled-password --gecos "" "$username"
@@ -69,4 +69,3 @@ else
 fi
 
 echo "User $username created successfully."
-
