@@ -9,3 +9,4 @@ sudo systemctl start caddy
 sudo systemctl enable caddy
 sudo systemctl status caddy
 
+echo "✅ Installation complete!"
