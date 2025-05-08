@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Prompt for the Ubuntu codename and PostgreSQL version
-read -p "Enter the Ubuntu codename (e.g., jammy): " codename
+read -p "Enter the Ubuntu codename (e.g., focal, jammy, noble): " codename
 read -p "Enter the PostgreSQL version (e.g., 17): " pg_version
 
 # Check if codename or PostgreSQL version is empty

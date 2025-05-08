@@ -12,16 +12,27 @@ if [[ -z "$username" || -z "$password" ]]; then
 fi
 
 # Create a new user and set the password
-adduser --disabled-password --gecos "" $username
+adduser --disabled-password --gecos "" "$username"
 echo "$username:$password" | chpasswd
 
 # Grant the new user sudo privileges
-usermod -aG sudo $username
+usermod -aG sudo "$username"
 
-# Disable root login
-sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+# Ask whether to disable root login
+read -p "Do you want to disable root SSH login? [y/N]: " disable_root
+if [[ "$disable_root" =~ ^[Yy]$ ]]; then
+  # Disable root login
+  if grep -q "^PermitRootLogin" /etc/ssh/sshd_config; then
+    sed -i 's/^PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config
+  else
+    echo "PermitRootLogin no" >> /etc/ssh/sshd_config
+  fi
 
-# Restart the SSH service
-systemctl restart sshd
+  # Restart the SSH service
+  systemctl restart sshd
+  echo "Root SSH login has been disabled."
+else
+  echo "Skipping disabling of root SSH login."
+fi
 
-echo "User $username created and root login disabled."
+echo "User $username created successfully."

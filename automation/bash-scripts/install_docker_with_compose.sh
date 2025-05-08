@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Prompt for the Ubuntu codename
-read -p "Enter the Ubuntu codename (e.g., focal, jammy): " codename
+read -p "Enter the Ubuntu codename (e.g., focal, jammy, noble): " codename
 
 # Check if codename is empty
 if [[ -z "$codename" ]]; then
