@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Determine which user’s keys to copy: prefer SUDO_USER when using sudo
+source_user="${SUDO_USER:-$USER}"
 read -p "Enter new username: " username
 
 # Prompt for password twice (hidden)
@@ -46,6 +48,25 @@ else
   echo "No SSH service (sshd or ssh) is active; skipping restart."
 fi
 
+# Ask whether to copy the invoker’s authorized_keys to the new user
+read -p "Copy SSH keys from '$source_user' to '$username'? [y/N]: " copy_keys
+if [[ "$copy_keys" =~ ^[Yy]$ ]]; then
+  # Resolve the home directory of the source user
+  source_home="$(getent passwd "$source_user" | cut -d: -f6)"
+  target_ssh_dir="/home/$username/.ssh"
+
+  # Ensure the target .ssh directory exists
+  mkdir -p "$target_ssh_dir"
+
+  # Copy and secure
+  cp "$source_home/.ssh/authorized_keys" "$target_ssh_dir/authorized_keys"
+  chmod 600 "$target_ssh_dir/authorized_keys"
+  chown -R "$username:$username" "$target_ssh_dir"
+
+  echo "Copied SSH keys from '$source_user' to '$username'."
+else
+  echo "Skipping SSH key copy."
+fi
 
 echo "User $username created successfully."
-echo "Don't forget to set up SSH keys for the new user!"
+echo "Don't forget to set up any additional SSH keys as needed!"
