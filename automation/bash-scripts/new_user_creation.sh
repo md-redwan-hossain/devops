@@ -30,10 +30,21 @@ if [[ "$disable_root" =~ ^[Yy]$ ]]; then
   else
     echo "PermitRootLogin no" >> /etc/ssh/sshd_config
   fi
-  systemctl restart sshd
   echo "Root SSH login disabled."
 else
   echo "Root SSH login left unchanged."
 fi
+
+# Restart whichever SSH service is active
+if systemctl is-active --quiet sshd; then
+  systemctl restart sshd
+  echo "Restarted sshd.service"
+elif systemctl is-active --quiet ssh; then
+  systemctl restart ssh
+  echo "Restarted ssh.service"
+else
+  echo "No SSH service (sshd or ssh) is active; skipping restart."
+fi
+
 
 echo "User $username created successfully."
