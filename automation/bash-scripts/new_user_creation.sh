@@ -69,4 +69,4 @@ else
 fi
 
 echo "User $username created successfully."
-echo "Don't forget to set up any additional SSH keys as needed!"
+
