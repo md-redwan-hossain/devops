@@ -48,3 +48,4 @@ fi
 
 
 echo "User $username created successfully."
+echo "Don't forget to set up SSH keys for the new user!"
