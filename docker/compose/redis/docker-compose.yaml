@@ -1,17 +1,22 @@
-version: "3"
 services:
   redis_db:
-    image: "bitnami/redis:7.2"
+    image: "bitnami/redis:8.0"
     restart: unless-stopped
+    env_file:
+      - ./.env
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     ports:
-      - "6379:6379"
+      - "6377:6379"
     volumes:
       - "redis_data:/bitnami/redis/data"
     environment:
-      REDIS_PASSWORD: admin
+      REDIS_PASSWORD: ${REDIS_DB_PASSWORD}
       REDIS_IO_THREADS: 4
       REDIS_IO_THREADS_DO_READS: yes
-      REDIS_DISABLE_COMMANDS: FLUSHDB,FLUSHALL
 
 volumes:
   redis_data:
