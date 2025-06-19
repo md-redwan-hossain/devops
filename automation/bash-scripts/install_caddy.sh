@@ -7,6 +7,6 @@ sudo apt update
 sudo apt install caddy -y
 sudo systemctl start caddy
 sudo systemctl enable caddy
-sudo systemctl status caddy
+sudo systemctl status --no-pager --full caddy
 
 echo "✅ Installation complete!"
