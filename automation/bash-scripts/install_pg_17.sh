@@ -1,8 +1,15 @@
 #!/bin/bash
 
 # Prompt for the Ubuntu codename and PostgreSQL version
-read -p "Enter the Ubuntu codename (e.g., focal, jammy, noble): " codename
-read -p "Enter the PostgreSQL version (e.g., 17): " pg_version
+while true; do
+  read -p "Enter the Ubuntu codename (e.g., focal, jammy, noble): " codename_input
+  codename=$(echo "$codename_input" | tr '[:upper:]' '[:lower:]')
+  if [[ "$codename" =~ ^(focal|jammy|noble)$ ]]; then
+    break
+  else
+    echo "Invalid codename. Please enter one of: focal, jammy, noble."
+  fi
+done
 
 # Check if codename or PostgreSQL version is empty
 if [[ -z "$codename" || -z "$pg_version" ]]; then

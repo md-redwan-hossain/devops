@@ -1,13 +1,17 @@
 #!/bin/bash
 
 # Prompt for the Ubuntu codename
-read -p "Enter the Ubuntu codename (e.g., focal, jammy, noble): " codename
-
-# Check if codename is empty
-if [[ -z "$codename" ]]; then
-  echo "Codename cannot be empty. Exiting."
-  exit 1
-fi
+while true; do
+  read -p "Enter the Ubuntu codename (e.g., focal, jammy, noble): " codename_input
+  codename=$(echo "$codename_input" | tr '[:upper:]' '[:lower:]')
+  if [[ -z "$codename" ]]; then
+    echo "Codename cannot be empty. Please try again."
+  elif [[ "$codename" =~ ^(focal|jammy|noble)$ ]]; then
+    break
+  else
+    echo "Invalid codename. Please enter one of: focal, jammy, noble."
+  fi
+done
 
 # Update package lists and install prerequisites
 sudo apt update
