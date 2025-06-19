@@ -7,7 +7,7 @@ curl -fsSL https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scr
 
 # Install McFly
 echo "Installing McFly..."
-curl -LSfs https://raw.githubusercontent.com/cantino/mcfly/master/ci/install.sh | sh -s -- --git cantino/mcfly \
+curl -LSfs https://raw.githubusercontent.com/cantino/mcfly/master/ci/install.sh | sudo sh -s -- --git cantino/mcfly \
   || { echo "Failed to install McFly"; exit 1; }
 
 

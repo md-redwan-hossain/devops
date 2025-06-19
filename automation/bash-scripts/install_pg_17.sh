@@ -44,8 +44,12 @@ sudo systemctl enable postgresql
 # Check the status of PostgreSQL service
 sudo systemctl status --no-pager --full postgresql
 
-# Add PostgreSQL binary path to .bashrc and source it
-echo "PATH=\$PATH:/usr/lib/postgresql/$pg_version/bin" >> ~/.bashrc
+# Add PostgreSQL bin directory to PATH permanently
+if ! grep -q '/usr/lib/postgresql/$pg_version/bin' "$HOME/.bashrc"; then
+  echo "" >> "$HOME/.bashrc"
+  echo "export PATH=\"/usr/lib/postgresql/$pg_version/bin:\$PATH\"" >> "$HOME/.bashrc"
+fi
+
 source ~/.bashrc
 
 echo "PostgreSQL $pg_version installation and setup completed for Ubuntu $codename."
