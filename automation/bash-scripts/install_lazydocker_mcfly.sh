@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Install or update lazydocker
+echo "Installing/updating lazydocker..."
+curl -fsSL https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash  \
+  || { echo "Failed to install lazydocker"; exit 1; }
+
+# Install McFly
+echo "Installing McFly..."
+curl -LSfs https://raw.githubusercontent.com/cantino/mcfly/master/ci/install.sh | sh -s -- --git cantino/mcfly \
+  || { echo "Failed to install McFly"; exit 1; }
+
+
 # Add ~/.local/bin to PATH permanently
 if ! grep -q '$HOME/.local/bin' "$HOME/.bashrc"; then
   echo "" >> "$HOME/.bashrc"
@@ -13,15 +24,5 @@ if ! grep -q "mcfly init bash" "$HOME/.bashrc"; then
 fi
 
 source ~/.bashrc
-
-# Install or update lazydocker
-echo "Installing/updating lazydocker..."
-curl -fsSL https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash  \
-  || { echo "Failed to install lazydocker"; exit 1; }
-
-# Install McFly
-echo "Installing McFly..."
-curl -LSfs https://raw.githubusercontent.com/cantino/mcfly/master/ci/install.sh | sh -s -- --git cantino/mcfly \
-  || { echo "Failed to install McFly"; exit 1; }
 
 echo "✅ Installation complete!"
