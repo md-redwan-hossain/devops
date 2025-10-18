@@ -11,7 +11,7 @@
 
 \if TRUE
 
-\if TRUE
+\if FALSE
 DROP DATABASE IF EXISTS :dbname;
 DROP USER IF EXISTS :admin_user;
 DROP USER IF EXISTS :regular_user;
