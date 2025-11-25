@@ -1,4 +1,4 @@
--- Control flags
+-- Control flags for what to create (set to FALSE to skip creation)
 \set create_database TRUE
 \set create_admin_user TRUE
 \set create_schema FALSE
@@ -57,12 +57,21 @@ CREATE USER :readonly_user WITH ENCRYPTED PASSWORD :'readonly_user_password';
 -- ============================================================================
 \if :create_admin_user
 
--- Grant full privileges to the admin user on test_schema
+-- Grant full privileges to the admin user on database
 GRANT ALL PRIVILEGES ON DATABASE :dbname TO :admin_user;
+
+-- Grant privileges on test_schema if it's being created
+\if :create_schema
 GRANT ALL PRIVILEGES ON SCHEMA :schema_to_create TO :admin_user;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA :schema_to_create TO :admin_user;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA :schema_to_create TO :admin_user;
 GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA :schema_to_create TO :admin_user;
+
+-- Set default privileges for the admin user on test_schema
+ALTER DEFAULT PRIVILEGES IN SCHEMA :schema_to_create GRANT ALL PRIVILEGES ON TABLES TO :admin_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA :schema_to_create GRANT ALL PRIVILEGES ON SEQUENCES TO :admin_user;
+ALTER DEFAULT PRIVILEGES IN SCHEMA :schema_to_create GRANT ALL PRIVILEGES ON FUNCTIONS TO :admin_user;
+\endif
 
 -- Grant full privileges to the admin user on public schema
 GRANT ALL PRIVILEGES ON SCHEMA public TO :admin_user;
@@ -70,11 +79,7 @@ GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO :admin_user;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO :admin_user;
 GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO :admin_user;
 
--- Set default privileges for the admin user
-ALTER DEFAULT PRIVILEGES IN SCHEMA :schema_to_create GRANT ALL PRIVILEGES ON TABLES TO :admin_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA :schema_to_create GRANT ALL PRIVILEGES ON SEQUENCES TO :admin_user;
-ALTER DEFAULT PRIVILEGES IN SCHEMA :schema_to_create GRANT ALL PRIVILEGES ON FUNCTIONS TO :admin_user;
-
+-- Set default privileges for the admin user on public schema
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON TABLES TO :admin_user;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON SEQUENCES TO :admin_user;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON FUNCTIONS TO :admin_user;
@@ -86,8 +91,11 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL PRIVILEGES ON FUNCTIONS TO :
 -- ============================================================================
 \if :create_regular_user
 
--- Grant limited privileges to the regular user on test_schema
+-- Grant limited privileges to the regular user
 GRANT CONNECT ON DATABASE :dbname TO :regular_user;
+
+-- Grant privileges on test_schema if it's being created
+\if :create_schema
 GRANT USAGE ON SCHEMA :schema_to_create TO :regular_user;
 
 -- Grant limited privileges on tables and sequences in test_schema
@@ -106,6 +114,7 @@ GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO :regular_user;
 
 ALTER DEFAULT PRIVILEGES FOR ROLE :admin_user IN SCHEMA :schema_to_create
 GRANT EXECUTE ON FUNCTIONS TO :regular_user;
+\endif
 
 -- Grant limited privileges to the regular user on public schema
 GRANT USAGE ON SCHEMA public TO :regular_user;
@@ -132,8 +141,11 @@ GRANT EXECUTE ON FUNCTIONS TO :regular_user;
 -- ============================================================================
 \if :create_readonly_user
 
--- Grant privileges to the read-only user on test_schema
+-- Grant privileges to the read-only user
 GRANT CONNECT ON DATABASE :dbname TO :readonly_user;
+
+-- Grant privileges on test_schema if it's being created
+\if :create_schema
 GRANT USAGE ON SCHEMA :schema_to_create TO :readonly_user;
 
 -- Grant SELECT privilege on all tables and views in test_schema
@@ -154,6 +166,7 @@ GRANT USAGE, SELECT ON SEQUENCES TO :readonly_user;
 
 ALTER DEFAULT PRIVILEGES FOR ROLE :admin_user IN SCHEMA :schema_to_create
 GRANT EXECUTE ON FUNCTIONS TO :readonly_user;
+\endif
 
 -- Grant privileges to the read-only user on public schema
 GRANT USAGE ON SCHEMA public TO :readonly_user;
