@@ -18,10 +18,18 @@
 
 -- Drop existing resources if flag is set
 \if :drop_existing
+\if :create_database
 DROP DATABASE IF EXISTS :dbname;
+\endif
+\if :create_admin_user
 DROP USER IF EXISTS :admin_user;
+\endif
+\if :create_regular_user
 DROP USER IF EXISTS :regular_user;
+\endif
+\if :create_readonly_user
 DROP USER IF EXISTS :readonly_user;
+\endif
 \endif
 
 -- Create the database if flag is set
