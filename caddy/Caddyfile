@@ -1,0 +1,72 @@
+(html_cache_config) {
+	@html {
+		path *.html
+	}
+	header @html {
+		Cache-Control "no-cache, no-store, must-revalidate"
+		Pragma "no-cache"
+		Expires "0"
+	}
+}
+
+
+(reverse_proxy_config) {
+	header_up Host {host}
+	header_up X-Real-IP {remote_host}
+	header_up X-Forwarded-For {remote_host}
+	header_up X-Forwarded-Proto {scheme}
+}
+
+https://my-domain.com {
+	import html_cache_config
+	encode gzip
+	file_server
+
+	# backend
+	handle /api* {
+		reverse_proxy http://127.0.0.1:8095 {
+			import reverse_proxy_config
+		}
+	}
+
+	# frontend
+	handle {
+		reverse_proxy http://127.0.0.1:95 {
+			import reverse_proxy_config
+		}
+	}
+}
+
+https://s3.my-domain.com {
+	encode gzip
+
+	@console {
+		path /
+		path /rustfs/console*
+	}
+
+	handle @console {
+		reverse_proxy http://127.0.0.1:9001 {
+			import reverse_proxy_config
+		}
+	}
+
+
+	# S3 API
+	handle {
+		reverse_proxy http://127.0.0.1:9000 {
+			import reverse_proxy_config
+
+			request_buffers 0
+			response_buffers 0
+
+			header_up X-Amz-Date {header.X-Amz-Date}
+      header_up Authorization {header.Authorization}
+
+			transport http {
+				read_timeout 300s
+				write_timeout 300s
+			}
+		}
+	}
+}
