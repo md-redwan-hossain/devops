@@ -14,7 +14,7 @@ services:
       - GITEA__server__SSH_PORT=${GITEA_SSH_PORT}      
 
       - GITEA__database__DB_TYPE=postgres
-      - GITEA__database__HOST=db:${GITEA_DB_HOST}
+      - GITEA__database__HOST=${GITEA_DB_HOST}
       - GITEA__database__NAME=${GITEA_DB_NAME}
       - GITEA__database__USER=${GITEA_DB_USER}
       - GITEA__database__PASSWD=${GITEA_DB_PASSWORD}
