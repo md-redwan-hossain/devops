@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Determine which user’s keys to copy: prefer SUDO_USER when using sudo
 source_user="${SUDO_USER:-$USER}"
+
 read -p "Enter new username: " username
 
-# Loop until password and confirmation match
 while true; do
   read -s -p "Enter password for $username: " password
   echo
@@ -17,14 +16,10 @@ while true; do
   echo "Passwords do not match. Please try again." >&2
 done
 
-# Create the user and set the password
 adduser --disabled-password --gecos "" "$username"
 echo "$username:$password" | chpasswd
-
-# Grant sudo privileges
 usermod -aG sudo "$username"
 
-# Ask whether to disable root SSH login
 read -p "Disable root SSH login? [y/N]: " disable_root
 if [[ "$disable_root" =~ ^[Yy]$ ]]; then
   if grep -q "^PermitRootLogin" /etc/ssh/sshd_config; then
@@ -37,7 +32,6 @@ else
   echo "Root SSH login left unchanged."
 fi
 
-# Restart whichever SSH service is active
 if systemctl is-active --quiet sshd; then
   systemctl restart sshd
   echo "Restarted sshd.service"
@@ -48,24 +42,19 @@ else
   echo "No SSH service (sshd or ssh) is active; skipping restart."
 fi
 
-# Ask whether to copy the invoker’s authorized_keys to the new user
-read -p "Copy SSH keys from '$source_user' to '$username'? [y/N]: " copy_keys
-if [[ "$copy_keys" =~ ^[Yy]$ ]]; then
-  # Resolve the home directory of the source user
-  source_home="$(getent passwd "$source_user" | cut -d: -f6)"
-  target_ssh_dir="/home/$username/.ssh"
+source_home="$(getent passwd "$source_user" | cut -d: -f6)"
+src_keys="$source_home/.ssh/authorized_keys"
 
-  # Ensure the target .ssh directory exists
-  mkdir -p "$target_ssh_dir"
-
-  # Copy and secure
-  cp "$source_home/.ssh/authorized_keys" "$target_ssh_dir/authorized_keys"
-  chmod 600 "$target_ssh_dir/authorized_keys"
-  chown -R "$username:$username" "$target_ssh_dir"
-
-  echo "Copied SSH keys from '$source_user' to '$username'."
-else
-  echo "Skipping SSH key copy."
+if [[ -f "$src_keys" ]]; then
+  read -p "Copy SSH keys from '$source_user' to '$username'? [y/N]: " copy_keys
+  if [[ "$copy_keys" =~ ^[Yy]$ ]]; then
+    target_ssh_dir="/home/$username/.ssh"
+    mkdir -p "$target_ssh_dir"
+    cp "$src_keys" "$target_ssh_dir/authorized_keys"
+    chmod 600 "$target_ssh_dir/authorized_keys"
+    chown -R "$username:$username" "$target_ssh_dir"
+    echo "Copied SSH keys from '$source_user' to '$username'."
+  fi
 fi
 
-echo "User $username created successfully."
+echo "User '$username' created successfully."
