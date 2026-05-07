@@ -1,0 +1,22 @@
+services:
+  gitea-runner:
+    image: gitea/act_runner:latest
+    container_name: gitea-runner
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/data
+      - ./config.yaml:/config.yaml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: >
+      sh -c "
+      if [ ! -f /data/.runner ]; then
+        act_runner register --no-interactive
+        --instance $${GITEA_RUNNER_INSTANCE_URL}
+        --token $${GITEA_RUNNER_REGISTRATION_TOKEN}
+        --name $${GITEA_RUNNER_NAME}
+        --labels $${GITEA_RUNNER_LABELS};
+      fi;
+      act_runner daemon --config /config.yaml
+      "
