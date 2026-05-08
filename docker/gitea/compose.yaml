@@ -17,7 +17,7 @@ services:
         timeout: 5s
         retries: 5
       volumes:
-        - "./gitea_db:/var/lib/postgresql"
+        - "./container_data/gitea_db:/var/lib/postgresql"
       networks:
       - gitea
 
@@ -40,7 +40,7 @@ services:
       - GITEA__database__USER=${DB_USER}
       - GITEA__database__PASSWD=${DB_PASSWORD}
     volumes:
-      - ./gitea_data:/data
+      - ./container_data/gitea_data:/data
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
