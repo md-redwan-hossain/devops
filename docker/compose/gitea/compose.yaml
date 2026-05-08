@@ -30,14 +30,27 @@ services:
     environment:
       USER_UID: 1000
       USER_GID: 1000
+
       GITEA__server__ROOT_URL: ${ROOT_URL}
       GITEA__server__HTTP_PORT: ${WEB_PORT}
       GITEA__server__SSH_PORT: ${SSH_PORT}
+      GITEA__server__LANDING_PAGE: login
+
+      GITEA__security__PASSWORD_HASH_ALGO: argon2
+
+      GITEA__service__DISABLE_REGISTRATION: true
+      GITEA__service__REQUIRE_SIGNIN_VIEW: true
+      GITEA__service__DEFAULT_ALLOW_CREATE_ORGANIZATION: false
+
+      GITEA__openid__ENABLE_OPENID_SIGNIN: false
+      GITEA__openid__ENABLE_OPENID_SIGNUP: false
+      
       GITEA__database__DB_TYPE: postgres
       GITEA__database__HOST: gitea_db:5432
       GITEA__database__NAME: ${DB_NAME}
       GITEA__database__USER: ${DB_USER}
       GITEA__database__PASSWD: ${DB_PASSWORD}
+      
       GITEA_RUNNER_REGISTRATION_TOKEN: ${RUNNER_REGISTRATION_TOKEN}
     volumes:
       - ./container_data/gitea_data:/data
