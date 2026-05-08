@@ -2,11 +2,13 @@ services:
   mariadb_db:
     image: bitnami/mariadb:11.2
     restart: unless-stopped
+    env_file:
+      - ./.env
     environment:
-      MARIADB_ROOT_PASSWORD: master-super-password
-      MARIADB_USER: super-admin
-      MARIADB_PASSWORD: super-password
-      MARIADB_DATABASE: demo_db
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
     ports:
       - "3309:3306"
     volumes:

@@ -2,11 +2,13 @@ services:
     mysql_db:
         image: bitnami/mysql:9.0
         restart: unless-stopped
+        env_file:
+            - ./.env
         environment:
-            MYSQL_ROOT_PASSWORD: master-super-password
-            MYSQL_USER: super-admin
-            MYSQL_PASSWORD: super-password
-            MYSQL_DATABASE: demo_db
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
         ports:
             - "3306:3306"
         volumes:
