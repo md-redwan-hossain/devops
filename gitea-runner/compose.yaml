@@ -4,9 +4,9 @@ services:
     container_name: gitea-runner
     restart: unless-stopped
     env_file:
-      - .env
+      - ./.env
     volumes:
-      - ./data:/data
+      - ./gitea_runner_data:/data
       - ./config.yaml:/config.yaml:ro
       - /var/run/docker.sock:/var/run/docker.sock
     command: >
