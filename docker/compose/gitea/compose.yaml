@@ -44,7 +44,11 @@ services:
 
       GITEA__openid__ENABLE_OPENID_SIGNIN: false
       GITEA__openid__ENABLE_OPENID_SIGNUP: false
-      
+
+      GITEA__other__SHOW_FOOTER_VERSION: false
+      GITEA__other__SHOW_FOOTER_TEMPLATE_LOAD_TIME: false
+      GITEA__other__SHOW_FOOTER_POWERED_BY: false
+
       GITEA__database__DB_TYPE: postgres
       GITEA__database__HOST: gitea_db:5432
       GITEA__database__NAME: ${DB_NAME}
