@@ -1,0 +1,85 @@
+services:
+  gitea_db:
+    container_name: gitea_pg_db
+    image: postgres:18
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGTZ: "UTC"
+      TZ: "UTC"
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${DB_USER} -d ${DB_NAME}'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - "./container_data/gitea_db:/var/lib/postgresql"
+    networks:
+      - gitea
+
+  gitea:
+    image: gitea/gitea:1.26
+    container_name: gitea
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    environment:
+      USER_UID: 1000
+      USER_GID: 1000
+      GITEA__server__ROOT_URL: ${ROOT_URL}
+      GITEA__server__HTTP_PORT: ${WEB_PORT}
+      GITEA__server__SSH_PORT: ${SSH_PORT}
+      GITEA__database__DB_TYPE: postgres
+      GITEA__database__HOST: gitea_db:5432
+      GITEA__database__NAME: ${DB_NAME}
+      GITEA__database__USER: ${DB_USER}
+      GITEA__database__PASSWD: ${DB_PASSWORD}
+      GITEA_RUNNER_REGISTRATION_TOKEN: ${RUNNER_REGISTRATION_TOKEN}
+    volumes:
+      - ./container_data/gitea_data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "${SSH_PORT}:22"
+      - "${WEB_PORT}:3000"
+    networks:
+      - gitea
+    healthcheck:
+      test: ["CMD", "curl", "-f", "${ROOT_URL}"]
+      interval: 10s
+      retries: 3
+      start_period: 30s
+      timeout: 10s
+    depends_on:
+      gitea_db:
+        condition: service_healthy
+
+  gitea-runner:
+    image: gitea/runner
+    container_name: gitea_runner
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    depends_on:
+      gitea:
+        condition: service_healthy
+        restart: true
+    environment:
+      GITEA_INSTANCE_URL: ${ROOT_URL}
+      GITEA_RUNNER_REGISTRATION_TOKEN: ${RUNNER_REGISTRATION_TOKEN}
+      CONFIG_FILE: /config.yaml
+    volumes:
+      - ./container_data/gitea_runner_data:/data
+      - ./config.yaml:/config.yaml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+
+    networks:
+      - gitea
+
+networks:
+  gitea:
+    external: false
