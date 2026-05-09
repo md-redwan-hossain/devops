@@ -3,7 +3,7 @@ log:
 
 runner:
   file: .runner
-  capacity: 1
+  capacity: 2
   timeout: 3h
   insecure: false
   fetch_timeout: 5s
