@@ -12,6 +12,26 @@
       "htpasswd": {
         "path": "/etc/zot/htpasswd"
       }
+    },
+    "accessControl": {
+      "adminPolicy": {
+        "users": ["admin"],
+        "actions": ["read", "create", "update", "delete"]
+      },
+      "repositories": {
+        "example_repo": {
+          "policies": [
+            {
+              "users": ["example_user"],
+              "actions": ["read"]
+            }
+          ]
+        },
+        "**": {
+          "defaultPolicy": [],
+          "anonymousPolicy": []
+        }
+      }
     }
   },
   "log": {
@@ -27,14 +47,6 @@
     "scrub": {
       "enable": true,
       "interval": "24h"
-    }
-  },
-  "accessControl": {
-    "repositories": {
-      "**": {
-        "defaultPolicy": [],
-        "anonymousPolicy": []
-      }
     }
   }
 }
