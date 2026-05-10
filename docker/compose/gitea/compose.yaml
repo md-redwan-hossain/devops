@@ -66,7 +66,7 @@ services:
     networks:
       - gitea
     healthcheck:
-      test: ["CMD", "curl", "-f", "${ROOT_URL}"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/api/healthz >/dev/null || exit 1"]
       interval: 10s
       retries: 3
       start_period: 30s
