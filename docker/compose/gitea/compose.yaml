@@ -42,7 +42,9 @@ services:
 
       GITEA__security__PASSWORD_HASH_ALGO: argon2
 
-      GITEA__log.console.router__LEVEL: Warn
+      GITEA__log__logger.router.MODE: rtrcnsol
+      GITEA__log.rtrcnsol__MODE: console
+      GITEA__log.rtrcnsol__LEVEL: Warn
 
       GITEA__service__DISABLE_REGISTRATION: true
       GITEA__service__REQUIRE_SIGNIN_VIEW: true
