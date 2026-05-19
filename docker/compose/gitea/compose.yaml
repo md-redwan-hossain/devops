@@ -13,9 +13,11 @@ services:
       TZ: "UTC"
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'pg_isready -U ${DB_USER} -d ${DB_NAME}'"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      start_period: 30s
+      interval: 300s
+      start_interval: 5s
+      retries: 3
+      timeout: 10s
     volumes:
       - "./container_data/gitea_db:/var/lib/postgresql"
     networks:
@@ -36,13 +38,22 @@ services:
       GITEA__server__HTTP_PORT: ${WEB_PORT}
       GITEA__server__SSH_PORT: ${SSH_PORT}
       GITEA__server__START_SSH_SERVER: true
-      GITEA__server__SSH_LISTEN_PORT: "22"
+      GITEA__server__SSH_LISTEN_PORT: 22
 
       GITEA__security__PASSWORD_HASH_ALGO: argon2
 
+      GITEA__log__logger.router.MODE: rtrcnsol
+      GITEA__log.rtrcnsol__MODE: console
+      GITEA__log.rtrcnsol__LEVEL: Warn
+
+      GITEA__repository__DISABLE_HTTP_GIT: true
+
       GITEA__service__DISABLE_REGISTRATION: true
       GITEA__service__REQUIRE_SIGNIN_VIEW: true
+      GITEA__service__DEFAULT_KEEP_EMAIL_PRIVATE: true
       GITEA__service__DEFAULT_ALLOW_CREATE_ORGANIZATION: false
+      GITEA__service__DEFAULT_ORG_VISIBILITY: "private"
+      GITEA__service__DEFAULT_USER_VISIBILITY: "private"
 
       GITEA__openid__ENABLE_OPENID_SIGNIN: false
       GITEA__openid__ENABLE_OPENID_SIGNUP: false
@@ -69,9 +80,10 @@ services:
       - gitea
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/api/healthz >/dev/null || exit 1"]
-      interval: 10s
-      retries: 3
       start_period: 30s
+      interval: 300s
+      start_interval: 5s
+      retries: 3
       timeout: 10s
     depends_on:
       gitea_db:
