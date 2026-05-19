@@ -46,8 +46,6 @@ services:
       GITEA__log.rtrcnsol__MODE: console
       GITEA__log.rtrcnsol__LEVEL: Warn
 
-      GITEA__repository__DISABLE_HTTP_GIT: true
-
       GITEA__service__DISABLE_REGISTRATION: true
       GITEA__service__REQUIRE_SIGNIN_VIEW: true
       GITEA__service__DEFAULT_KEEP_EMAIL_PRIVATE: true
