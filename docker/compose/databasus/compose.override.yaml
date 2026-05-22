@@ -1,0 +1,9 @@
+services:
+  databasus:
+    networks:
+      - databasus
+      - caddy_network
+
+networks:
+  caddy_network:
+    external: true

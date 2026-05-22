@@ -1,0 +1,15 @@
+services:
+  databasus:
+    container_name: databasus
+    image: databasus/databasus:latest
+    ports:
+      - "4005:4005"
+    volumes:
+      - ./databasus-data:/databasus-data
+    restart: unless-stopped
+
+    networks:
+      - databasus
+
+networks:
+  databasus:
