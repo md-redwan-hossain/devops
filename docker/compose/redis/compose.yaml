@@ -1,12 +1,14 @@
 services:
-  redis_db:
+  redis:
     image: "redis:8"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
-      interval: 30s
-      timeout: 10s
+      start_period: 30s
+      interval: 300s
+      start_interval: 5s
       retries: 3
+      timeout: 10s
     command:
       - redis-server
       - "--requirepass"
@@ -17,7 +19,7 @@ services:
       - "6377:6379"
     volumes:
       - redis_data:/data
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
 
 volumes:
   redis_data:
