@@ -77,7 +77,11 @@ services:
     networks:
       - gitea
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:3000/api/healthz >/dev/null || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS http://127.0.0.1:3000/api/healthz >/dev/null || exit 1",
+        ]
       start_period: 30s
       interval: 300s
       start_interval: 5s
@@ -103,7 +107,7 @@ services:
       CONFIG_FILE: /config.yaml
     volumes:
       - ./container_data/gitea_runner_data:/data
-      - ./config.yaml:/config.yaml:ro
+      - ./config.yaml:/config.yaml
       - /var/run/docker.sock:/var/run/docker.sock
 
     networks:
