@@ -3,7 +3,29 @@
   "storage": {
     "rootDirectory": "/var/lib/registry",
     "dedupe": true,
-    "gc": true
+    "commit": true,
+    "gc": true,
+    "gcDelay": "1h",
+    "gcInterval": "24h",
+    "retention": {
+      "dryRun": false,
+      "delay": "24h",
+      "policies": [
+        {
+          "repositories": ["**"],
+          "deleteReferrers": true,
+          "deleteUntagged": true,
+          "keepTags": [
+            {
+              "patterns": ["latest"]
+            },
+            {
+              "mostRecentlyPushedCount": 5
+            }
+          ]
+        }
+      ]
+    }
   },
   "http": {
     "address": "0.0.0.0",
