@@ -1,5 +1,4 @@
 services:
-
   caddy:
     image: caddy
     container_name: caddy
@@ -13,8 +12,9 @@ services:
       - ./static_sites:/srv
       - ./caddy_data:/data
       - ./caddy_config:/config
+    networks:
+      - caddy_network
 
 networks:
-  default:
-    name: caddy_network
+  caddy_network:
     external: true
