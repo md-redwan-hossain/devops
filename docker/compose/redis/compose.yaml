@@ -21,9 +21,9 @@ services:
       - redis_data:/data
       - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
     networks:
-      - redis_net
+      - redis_network
 volumes:
   redis_data:
 networks:
-  redis_net:
+  redis_network:
     external: true
