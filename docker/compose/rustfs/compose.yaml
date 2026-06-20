@@ -1,20 +1,8 @@
 services:
-  rustfs_perms:
-    image: alpine
-    user: root
-    restart: "no"
-    volumes:
-      - ./rustfs_data:/fix_data
-      - ./rustfs_logs:/fix_logs
-    command: sh -c "chown -R 10001:10001 /fix_data /fix_logs"
-
   rustfs_server:
     image: rustfs/rustfs:latest
     container_name: rustfs_server
     restart: unless-stopped
-    depends_on:
-      rustfs_perms:
-        condition: service_completed_successfully
     security_opt:
       - "no-new-privileges:true"
     env_file:
