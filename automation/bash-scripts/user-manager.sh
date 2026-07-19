@@ -83,14 +83,15 @@ fi
 usermod -aG sudo "$username"
 echo "Ensured '$username' is in the sudo group."
 
-read -r -p "Disable root login with password? [y/N]: " disable_root_password
-read -r -p "Disable root login with SSH? [y/N]: " disable_root_ssh
-
 desired_root=""
+read -r -p "Disable all root SSH login? [y/N]: " disable_root_ssh
 if [[ "$disable_root_ssh" =~ ^[Yy]$ ]]; then
   desired_root="no"
-elif [[ "$disable_root_password" =~ ^[Yy]$ ]]; then
-  desired_root="prohibit-password"
+else
+  read -r -p "Disable root password login over SSH? [y/N]: " disable_root_password
+  if [[ "$disable_root_password" =~ ^[Yy]$ ]]; then
+    desired_root="prohibit-password"
+  fi
 fi
 
 if [[ -n "$desired_root" ]]; then
