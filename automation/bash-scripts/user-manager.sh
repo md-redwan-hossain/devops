@@ -92,11 +92,18 @@ else
   if [[ "$disable_root_password" =~ ^[Yy]$ ]]; then
     desired_root="prohibit-password"
   else
-    desired_root="yes"
+    read -r -p "Re-enable root SSH login? [y/N]: " reenable_root
+    if [[ "$reenable_root" =~ ^[Yy]$ ]]; then
+      desired_root="yes"
+    fi
   fi
 fi
 
-apply_permit_root_login "$desired_root"
+if [[ -n "$desired_root" ]]; then
+  apply_permit_root_login "$desired_root"
+else
+  echo "Root SSH settings left unchanged."
+fi
 
 if (( user_created )); then
   source_home="$(getent passwd "$source_user" | cut -d: -f6)"
