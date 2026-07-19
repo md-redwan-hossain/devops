@@ -33,6 +33,12 @@ reload_ssh_if_active() {
   fi
 }
 
+current_permit_root_login() {
+  if [[ -f "$sshd_dropin" ]]; then
+    tr -d '\r' <"$sshd_dropin" | sed -n 's/^PermitRootLogin[[:space:]]\{1,\}\([^[:space:]]*\).*/\1/p' | tail -n1
+  fi
+}
+
 apply_permit_root_login() {
   local desired="$1"
   local content="PermitRootLogin ${desired}"
@@ -92,9 +98,12 @@ else
   if [[ "$disable_root_password" =~ ^[Yy]$ ]]; then
     desired_root="prohibit-password"
   else
-    read -r -p "Re-enable root SSH login? [y/N]: " reenable_root
-    if [[ "$reenable_root" =~ ^[Yy]$ ]]; then
-      desired_root="yes"
+    current_root="$(current_permit_root_login)"
+    if [[ "$current_root" == "no" || "$current_root" == "prohibit-password" ]]; then
+      read -r -p "Re-enable root SSH login? [y/N]: " reenable_root
+      if [[ "$reenable_root" =~ ^[Yy]$ ]]; then
+        desired_root="yes"
+      fi
     fi
   fi
 fi
