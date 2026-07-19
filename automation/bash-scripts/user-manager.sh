@@ -91,14 +91,12 @@ else
   read -r -p "Disable root password login over SSH? [y/N]: " disable_root_password
   if [[ "$disable_root_password" =~ ^[Yy]$ ]]; then
     desired_root="prohibit-password"
+  else
+    desired_root="yes"
   fi
 fi
 
-if [[ -n "$desired_root" ]]; then
-  apply_permit_root_login "$desired_root"
-else
-  echo "Root SSH settings left unchanged."
-fi
+apply_permit_root_login "$desired_root"
 
 if (( user_created )); then
   source_home="$(getent passwd "$source_user" | cut -d: -f6)"
