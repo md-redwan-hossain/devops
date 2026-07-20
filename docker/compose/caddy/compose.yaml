@@ -14,7 +14,10 @@ services:
       - ./caddy_config:/config
     networks:
       - caddy_network
+      - app_network
 
 networks:
   caddy_network:
+    external: true
+  app_network:
     external: true
