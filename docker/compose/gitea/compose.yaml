@@ -40,6 +40,9 @@ services:
       GITEA__server__START_SSH_SERVER: true
       GITEA__server__SSH_LISTEN_PORT: 22
 
+      GITEA__repository__USER_MAX_CREATION_LIMIT : 0
+      GITEA__repository__DEFAULT_PRIVATE : private
+
       GITEA__security__PASSWORD_HASH_ALGO: argon2
 
       GITEA__log__logger.router.MODE: rtrcnsol
