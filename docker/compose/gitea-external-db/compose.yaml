@@ -11,7 +11,7 @@ services:
 
       GITEA__server__LANDING_PAGE: login
       GITEA__server__ROOT_URL: ${ROOT_URL}
-      GITEA__server__HTTP_PORT: ${WEB_PORT}
+      GITEA__server__HTTP_PORT: 3000
       GITEA__server__SSH_PORT: ${SSH_PORT}
       GITEA__server__START_SSH_SERVER: true
       GITEA__server__SSH_LISTEN_PORT: 22
@@ -57,6 +57,7 @@ services:
       - "host.docker.internal:host-gateway"
     networks:
       - gitea_network
+      - app_network
     healthcheck:
       test:
         [
@@ -80,7 +81,7 @@ services:
         condition: service_healthy
         restart: true
     environment:
-      GITEA_INSTANCE_URL: ${ROOT_URL}
+      GITEA_INSTANCE_URL: http://gitea:3000
       GITEA_RUNNER_REGISTRATION_TOKEN: ${RUNNER_REGISTRATION_TOKEN}
       CONFIG_FILE: /config.yaml
     volumes:
@@ -90,7 +91,10 @@ services:
 
     networks:
       - gitea_network
+      - app_network
 
 networks:
   gitea_network:
+    external: true
+  app_network:
     external: true

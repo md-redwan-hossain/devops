@@ -15,7 +15,9 @@ services:
     networks:
       - caddy_network
       - app_network
-
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      
 networks:
   caddy_network:
     external: true
