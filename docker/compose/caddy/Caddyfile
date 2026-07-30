@@ -9,6 +9,14 @@
     }
 }
 
+(websocket_config) {
+    flush_interval -1
+    transport http {
+        read_timeout 300s
+        write_timeout 300s
+    }
+}
+
 (reverse_proxy_config) {
     header_up Host {host}
     header_up X-Real-IP {remote_host}
