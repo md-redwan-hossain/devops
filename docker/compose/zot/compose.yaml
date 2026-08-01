@@ -2,19 +2,22 @@ services:
   zot_registry:
     image: ghcr.io/project-zot/zot:latest
     container_name: zot_registry
-    restart: unless-stopped    
+    restart: unless-stopped
     ports:
       - "5000:5000"
     volumes:
-      - zot_data:/var/lib/registry  
+      - zot_data:/var/lib/registry
       - ./htpasswd:/etc/zot/htpasswd
       - "./config.json:/etc/zot/config.json:ro"
     networks:
-      - zot
+      - zot_network
+      - app_network
 
 networks:
-  zot:
-    external: false
+  zot_network:
+    external: true
+  app_network:
+    external: true
 
 volumes:
   zot_data:
