@@ -13,7 +13,12 @@ prompt_password() {
     read -r -s -p "Confirm password for $username: " password2
     echo
     if [[ "$password" == "$password2" ]]; then
-      echo "$username:$password" | chpasswd
+      if ! echo "$username:$password" | sudo chpasswd; then
+        echo "Failed to set password for '$username'." >&2
+        echo "The password may have been rejected by system policy (too weak/short)." >&2
+        echo "Try a stronger password, or run: sudo passwd $username" >&2
+        exit 1
+      fi
       echo "Password set for '$username'."
       return
     fi
@@ -22,11 +27,11 @@ prompt_password() {
 }
 
 reload_ssh_if_active() {
-  if systemctl is-active --quiet sshd; then
-    systemctl reload sshd
+  if sudo systemctl is-active --quiet sshd; then
+    sudo systemctl reload sshd
     echo "Reloaded sshd.service"
-  elif systemctl is-active --quiet ssh; then
-    systemctl reload ssh
+  elif sudo systemctl is-active --quiet ssh; then
+    sudo systemctl reload ssh
     echo "Reloaded ssh.service"
   else
     echo "No SSH service (sshd or ssh) is active; skipping reload."
@@ -34,8 +39,8 @@ reload_ssh_if_active() {
 }
 
 current_permit_root_login() {
-  if [[ -f "$sshd_dropin" ]]; then
-    tr -d '\r' <"$sshd_dropin" | sed -n 's/^PermitRootLogin[[:space:]]\{1,\}\([^[:space:]]*\).*/\1/p' | tail -n1
+  if sudo test -f "$sshd_dropin"; then
+    sudo cat "$sshd_dropin" | tr -d '\r' | sed -n 's/^PermitRootLogin[[:space:]]\{1,\}\([^[:space:]]*\).*/\1/p' | tail -n1
   fi
 }
 
@@ -44,8 +49,8 @@ apply_permit_root_login() {
   local content="PermitRootLogin ${desired}"
   local current=""
 
-  if [[ -f "$sshd_dropin" ]]; then
-    current="$(tr -d '\r' <"$sshd_dropin" | sed '/^[[:space:]]*$/d')"
+  if sudo test -f "$sshd_dropin"; then
+    current="$(sudo cat "$sshd_dropin" | tr -d '\r' | sed '/^[[:space:]]*$/d')"
   fi
 
   if [[ "$current" == "$content" ]]; then
@@ -53,13 +58,13 @@ apply_permit_root_login() {
     return
   fi
 
-  mkdir -p "$(dirname "$sshd_dropin")"
-  printf '%s\n' "$content" >"$sshd_dropin"
+  sudo mkdir -p "$(dirname "$sshd_dropin")"
+  printf '%s\n' "$content" | sudo tee "$sshd_dropin" >/dev/null
   echo "Set PermitRootLogin ${desired} in ${sshd_dropin}."
 
-  if ! sshd -t; then
+  if ! sudo sshd -t; then
     echo "sshd config test failed; removing ${sshd_dropin}." >&2
-    rm -f "$sshd_dropin"
+    sudo rm -f "$sshd_dropin"
     exit 1
   fi
 
@@ -81,12 +86,12 @@ if id "$username" &>/dev/null; then
     echo "Password left unchanged."
   fi
 else
-  adduser --disabled-password --gecos "" "$username"
+  sudo adduser --disabled-password --gecos "" "$username"
   user_created=1
   prompt_password
 fi
 
-usermod -aG sudo "$username"
+sudo usermod -aG sudo "$username"
 echo "Ensured '$username' is in the sudo group."
 
 desired_root=""
@@ -122,11 +127,11 @@ if (( user_created )); then
     read -r -p "Copy SSH keys from '$source_user' to '$username'? [y/N]: " copy_keys
     if [[ "$copy_keys" =~ ^[Yy]$ ]]; then
       target_ssh_dir="/home/$username/.ssh"
-      mkdir -p "$target_ssh_dir"
-      cp "$src_keys" "$target_ssh_dir/authorized_keys"
-      chmod 700 "$target_ssh_dir"
-      chmod 600 "$target_ssh_dir/authorized_keys"
-      chown -R "$username:$username" "$target_ssh_dir"
+      sudo mkdir -p "$target_ssh_dir"
+      sudo cp "$src_keys" "$target_ssh_dir/authorized_keys"
+      sudo chmod 700 "$target_ssh_dir"
+      sudo chmod 600 "$target_ssh_dir/authorized_keys"
+      sudo chown -R "$username:$username" "$target_ssh_dir"
       echo "Copied SSH keys from '$source_user' to '$username'."
     fi
   fi
