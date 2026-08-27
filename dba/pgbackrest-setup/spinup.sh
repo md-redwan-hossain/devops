@@ -23,10 +23,7 @@ fi
 
 sudo systemctl restart "$PG_SERVICE"
 
-if ! sudo -u postgres pgbackrest --stanza="$STANZA" info &>/dev/null; then
-  sudo -u postgres pgbackrest --stanza="$STANZA" stanza-create
-fi
-
+sudo -u postgres pgbackrest --stanza="$STANZA" stanza-create
 sudo -u postgres pgbackrest --stanza="$STANZA" check
 sudo -u postgres pgbackrest --stanza="$STANZA" --type=full backup
 
