@@ -1,0 +1,18 @@
+                             table created
+                                   ↓
+                              backup taken
+                                   ↓
+                             table deleted
+                                   ↓
+                           restore base backup
+                                   ↓
+                               WAL replay
+                                   ↓
+                           table still deleted
+
+Even after restoring the backup, the table remained deleted. This happened because PostgreSQL continued replaying WAL segments during recovery. Since the delete operation was recorded in WAL, it was replayed again during restore.
+PostgreSQL recovery is "greedy" by default—it will try to replay every piece of WAL it can find in the archive to bring you to the most recent state possible. By using --type=immediate, we tell pgBackRest to tell PostgreSQL: "Stop as soon as you reach a consistent state," effectively ignoring any changes (like our accidental DELETE) that happened after the backup was finalized.
+To prevent this, the restore command used:
+
+
+`pgbackrest --stanza=demo restore --type=immediate`

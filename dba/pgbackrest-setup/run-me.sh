@@ -38,7 +38,7 @@ if ! sudo -u postgres pgbackrest --stanza="$STANZA" info &>/dev/null; then
 fi
 
 sudo -u postgres pgbackrest --stanza="$STANZA" check
-sudo -u postgres pgbackrest --stanza="$STANZA" backup --type=full
+sudo -u postgres pgbackrest --stanza="$STANZA" --type=full backup
 
 sudo cp "$SCRIPT_DIR"/systemd/pgbackrest-full.service /etc/systemd/system/
 sudo cp "$SCRIPT_DIR"/systemd/pgbackrest-full.timer /etc/systemd/system/

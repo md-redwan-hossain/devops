@@ -7,4 +7,4 @@ Conflicts=pgbackrest-full.service
 [Service]
 Type=oneshot
 User=postgres
-ExecStart=/usr/bin/pgbackrest --stanza=main backup --type=incr
+ExecStart=/usr/bin/pgbackrest --stanza=main --type=incr backup
