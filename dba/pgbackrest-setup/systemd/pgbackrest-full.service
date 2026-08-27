@@ -1,6 +1,8 @@
 [Unit]
 Description=pgBackRest full backup (stanza main)
 After=network.target postgresql@18-main.service
+Requires=postgresql@18-main.service
+Conflicts=pgbackrest-incr.service
 
 [Service]
 Type=oneshot
