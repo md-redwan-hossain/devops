@@ -25,7 +25,8 @@ sudo systemctl restart "$PG_SERVICE"
 
 sudo -u postgres pgbackrest --stanza="$STANZA" stanza-create
 sudo -u postgres pgbackrest --stanza="$STANZA" check
-sudo -u postgres pgbackrest --stanza="$STANZA" --type=full backup
+sudo -u postgres pgbackrest --stanza="$STANZA" --repo=1 --type=full backup
+sudo -u postgres pgbackrest --stanza="$STANZA" --repo=2 --type=full backup
 
 sudo systemctl daemon-reload
 sudo systemctl enable --now pgbackrest-full.timer pgbackrest-incr.timer
