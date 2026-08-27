@@ -1,0 +1,9 @@
+[Unit]
+Description=pgBackRest incremental backup daily except Friday 02:00
+
+[Timer]
+OnCalendar=Mon..Thu,Sat,Sun *-*-* 02:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
