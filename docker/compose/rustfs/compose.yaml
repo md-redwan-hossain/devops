@@ -22,10 +22,13 @@ services:
       - ./rustfs_logs:/app/logs
     networks:
       - rustfs_network
+      - app_network
     ports:
       - "9000:9000"
       - "9001:9001"
 
 networks:
   rustfs_network:
+    external: true
+  app_network:
     external: true
