@@ -1,69 +1,70 @@
 (html_cache_config) {
-    @html {
-        path *.html
-    }
-    header @html {
-        Cache-Control "no-cache, no-store, must-revalidate"
-        Pragma "no-cache"
-        Expires "0"
-    }
+        @html {
+                path *.html
+        }
+        header @html {
+                Cache-Control "no-cache, no-store, must-revalidate"
+                Pragma "no-cache"
+                Expires "0"
+        }
 }
 
 (websocket_config) {
-    flush_interval -1
-    transport http {
-        read_timeout 300s
-        write_timeout 300s
-    }
+        flush_interval -1
+        transport http {
+                read_timeout 300s
+                write_timeout 300s
+        }
 }
 
 (reverse_proxy_config) {
-    header_up Host {host}
-    header_up X-Real-IP {remote_host}
-    header_up X-Forwarded-For {remote_host}
-    header_up X-Forwarded-Proto {scheme}
+        header_up Host {host}
+        header_up X-Real-IP {remote_host}
 }
 
-https://domain.com {
-    import html_cache_config
-    encode zstd gzip
+https://demo.com {
+        import html_cache_config
+        encode zstd gzip
 
-    handle /api/* /hubs/* {
-        reverse_proxy app_backend:8080 {
-            import reverse_proxy_config
-            import websocket_config
+        @backend {
+                path /api/*
+                path /hubs/*
         }
-    }
 
-    handle {
-        reverse_proxy app_frontend:80 {
-            import reverse_proxy_config
+        handle @backend {
+                reverse_proxy app_backend:8080 {
+                        import reverse_proxy_config
+                        import websocket_config
+                }
         }
-    }
+
+        handle {
+                reverse_proxy app_frontend:80 {
+                        import reverse_proxy_config
+                }
+        }
 }
 
 https://s3.com {
-    encode zstd gzip
-    @console {
-        path /
-        path /rustfs/console*
-    }
-    handle @console {
-        reverse_proxy rustfs_server:9001 {
-            import reverse_proxy_config
+        encode zstd gzip
+        @console {
+                path /
+                path /rustfs/console*
         }
-    }
-    handle {
-        reverse_proxy rustfs_server:9000 {
-            import reverse_proxy_config
-            request_buffers 0
-            response_buffers 0
-            header_up X-Amz-Date {header.X-Amz-Date}
-            header_up Authorization {header.Authorization}
-            transport http {
-                read_timeout 300s
-                write_timeout 300s
-            }
+        handle @console {
+                reverse_proxy rustfs_server:9001 {
+                        import reverse_proxy_config
+                }
         }
-    }
+        handle {
+                reverse_proxy rustfs_server:9000 {
+                        import reverse_proxy_config
+                        request_buffers 0
+                        response_buffers 0
+                        transport http {
+                                read_timeout 300s
+                                write_timeout 300s
+                        }
+                }
+        }
 }
