@@ -11,7 +11,7 @@ while true; do
   fi
 done
 
-read -p "Enter the PostgreSQL version (e.g., 17): " pg_version
+read -p "Enter the PostgreSQL version (e.g., 18): " pg_version
 
 # Check if codename or PostgreSQL version is empty
 if [[ -z "$codename" || -z "$pg_version" ]]; then
