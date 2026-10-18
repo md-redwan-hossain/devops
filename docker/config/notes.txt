@@ -1,0 +1,3 @@
+https://docs.docker.com/reference/cli/dockerd/#daemon-configuration-file
+
+sudo nano /etc/docker/daemon.json
