@@ -4,10 +4,12 @@ Sequin CDC audit (same host Postgres, Sequin Stream, single-file worker)
 Flow
 ----
 app tables --logical replication--> Sequin --Sequin Stream HTTP--> audit_worker
-  --> UPSERT public.audit_logs (same DB)
+  --> bulk UPSERT public.audit_logs (same DB)
 
 Loop safety: publication omits public.audit_logs; sequin.yaml exclude_tables;
 worker only writes public.audit_logs.
+
+Writes: temp table + binary COPY + INSERT…SELECT upsert (AttendanceDataPuller style).
 
 Dedup (Sequin audit guide style)
 --------------------------------
@@ -45,7 +47,7 @@ docker compose up -d --build
 Services:
   sequin_redis  - required by Sequin internally (NOT the audit sink)
   sequin        - CONFIG_FILE_PATH=/config/sequin.yaml, UI/API :7376
-  audit_worker  - Refit pull /receive + Dapper upsert + /ack
+  audit_worker  - Refit pull /receive + COPY bulk upsert + /ack
 
 Transaction annotations (user_id)
 -----------------------------------
