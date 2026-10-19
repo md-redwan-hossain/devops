@@ -1,0 +1,87 @@
+Sequin CDC audit (same host Postgres, Sequin Stream, single-file worker)
+=======================================================================
+
+Flow
+----
+app tables --logical replication--> Sequin --Sequin Stream HTTP--> audit_worker
+  --> UPSERT public.audit_logs (same DB)
+
+Loop safety: publication omits public.audit_logs; sequin.yaml exclude_tables;
+worker only writes public.audit_logs.
+
+Dedup (Sequin audit guide style)
+--------------------------------
+UNIQUE (row_identity, commit_lsn) — one row per PK per transaction.
+Worker: ON CONFLICT DO UPDATE (redelivery). Sequin opaque/base64
+idempotency_key is not stored.
+
+Prereqs
+-------
+1. Install CDC drop-in (restart required):
+   cp postgresql.conf /etc/postgresql/18/main/conf.d/98-pg-cdc.conf
+   # If using pgBackRest overlay, re-bootstrap or copy updated
+   # dba/pgbackrest-setup/postgresql.conf (wal_level = logical) to
+   # conf.d/99-pgbackrest.conf
+   systemctl restart postgresql@18-main
+
+2. Create Sequin state DB (once):
+   psql -U postgres -f sql/init_sequin_db.sql
+
+3. Create audit table (hand-managed; worker does not run DDL):
+   psql -U postgres -d "$DB_NAME" -f sql/ddl.sql
+
+4. Create sequin_user + publication sequin_pub (excludes audit_logs):
+   psql -U postgres -d "$DB_NAME" -f sql/sequin_cdc.sql
+   # then: ALTER ROLE sequin_user PASSWORD '...';  # match .env
+
+5. Copy .env.example -> .env and fill values.
+   DB_HOST / PG_HOSTNAME: host.docker.internal (compose adds host-gateway).
+
+Compose
+-------
+cd dba/pg-cdc-setup
+docker compose up -d --build
+
+Services:
+  sequin_redis  - required by Sequin internally (NOT the audit sink)
+  sequin        - CONFIG_FILE_PATH=/config/sequin.yaml, UI/API :7376
+  audit_worker  - Refit pull /receive + Dapper upsert + /ack
+
+Transaction annotations (user_id)
+-----------------------------------
+App transactions can set who made the change:
+
+BEGIN;
+SELECT pg_logical_emit_message(true, 'sequin:transaction_annotations.set',
+  '{"user_id":"12345"}');
+-- DML here
+COMMIT;
+
+Sequin attaches annotations to following ops in that txn.
+Worker stores metadata.transaction_annotations.user_id -> audit_logs.user_id.
+Unannotated changes leave user_id NULL.
+
+Smoke
+-----
+1. INSERT, UPDATE, or DELETE a row in a published app table.
+2. SELECT * FROM public.audit_logs ORDER BY occurred_at DESC LIMIT 20;
+   Expect operation_type = i|u|d; commit_lsn set.
+   insert/update: row_identity + row_changes; delete: row_changes IS NULL.
+   Sequin payload "changes" unused under REPLICA IDENTITY DEFAULT.
+3. Annotated txn -> user_id populated; unannotated -> user_id NULL.
+4. INSERT into public.audit_logs -> must not create a CDC loop.
+
+New tables
+----------
+After CREATE TABLE in public, add to publication if sequin_pub was empty or
+does not auto-include:
+  ALTER PUBLICATION sequin_pub ADD TABLE public.new_table;
+Grant SELECT to sequin_user if needed (default privileges cover new tables
+owned by the same role that set ALTER DEFAULT PRIVILEGES).
+
+Local worker (without Docker)
+-----------------------------
+dotnet run --project is not used; file-based:
+  cd worker
+  set env vars from .env
+  dotnet AuditStreamWorker.cs

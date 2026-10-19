@@ -1,0 +1,58 @@
+name: pg-cdc-audit
+
+services:
+  sequin_redis:
+    image: redis:7
+    command: ["redis-server", "--port", "6379", "--save", "", "--appendonly", "no"]
+    restart: unless-stopped
+
+  sequin:
+    image: sequin/sequin:latest
+    pull_policy: always
+    env_file: .env
+    environment:
+      CONFIG_FILE_PATH: /config/sequin.yaml
+      PG_HOSTNAME: ${PG_HOSTNAME}
+      PG_PORT: ${PG_PORT}
+      PG_DATABASE: ${PG_DATABASE}
+      PG_USERNAME: ${PG_USERNAME}
+      PG_PASSWORD: ${PG_PASSWORD}
+      PG_POOL_SIZE: ${PG_POOL_SIZE:-10}
+      REDIS_URL: ${REDIS_URL:-redis://sequin_redis:6379}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      VAULT_KEY: ${VAULT_KEY}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      SEQUIN_USER: ${SEQUIN_USER}
+      SEQUIN_USER_PASSWORD: ${SEQUIN_USER_PASSWORD}
+      SEQUIN_ADMIN_PASSWORD: ${SEQUIN_ADMIN_PASSWORD}
+      SEQUIN_API_TOKEN: ${SEQUIN_API_TOKEN}
+    volumes:
+      - ./sequin.yaml:/config/sequin.yaml:ro
+    ports:
+      - "7376:7376"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - sequin_redis
+    restart: unless-stopped
+
+  audit_worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      AUDIT_DB: ${AUDIT_DB}
+      SEQUIN_BASE_URL: ${SEQUIN_BASE_URL:-http://sequin:7376}
+      SEQUIN_API_TOKEN: ${SEQUIN_API_TOKEN}
+      SEQUIN_CONSUMER_NAME: ${SEQUIN_CONSUMER_NAME:-audit-stream}
+      BATCH_SIZE: ${BATCH_SIZE:-50}
+      WAIT_FOR_MS: ${WAIT_FOR_MS:-5000}
+      POLL_IDLE_MS: ${POLL_IDLE_MS:-1000}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - sequin
+    restart: unless-stopped

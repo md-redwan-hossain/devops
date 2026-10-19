@@ -1,0 +1,43 @@
+account:
+  name: "local"
+
+users:
+  - email: "admin@local"
+    password: "${SEQUIN_ADMIN_PASSWORD}"
+
+api_tokens:
+  - name: "audit-worker"
+    token: "${SEQUIN_API_TOKEN}"
+
+databases:
+  - name: "sequin_cdc"
+    hostname: "${DB_HOST}"
+    port: ${DB_PORT}
+    database: "${DB_NAME}"
+    username: "${SEQUIN_USER}"
+    password: |-
+      ${SEQUIN_USER_PASSWORD}
+    slot:
+      name: "sequin_slot"
+      create_if_not_exists: true
+    publication:
+      name: "sequin_pub"
+      create_if_not_exists: false
+
+sinks:
+  - name: "audit-stream"
+    database: "sequin_cdc"
+    status: active
+    actions:
+      - insert
+      - update
+      - delete
+    source:
+      exclude_schemas:
+        - "pg_catalog"
+        - "information_schema"
+        - "pg_toast"
+      exclude_tables:
+        - "public.audit_logs"
+    destination:
+      type: "sequin_stream"
